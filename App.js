@@ -9,12 +9,13 @@
 
 import { StatusBar } from 'expo-status-bar';
 import React , {useState} from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, TextInput, FlatList } from 'react-native';
 
 export default function App() {
   const[nome, setNome] = useState('');
   const[telefone, setTelefone] = useState('');
   const [dados, setDados] = useState([]);
+  const[idContato, setIdContato] = useState(10);
 
   //captura o texto digitado
   const capturaNome = (nome) => setNome(nome);
@@ -22,8 +23,9 @@ export default function App() {
 
   //para adicionar o que foi digitado
   const adicionarDadosContato = () => {
-    setDados(dados => [...dados, nome, telefone]);
     console.log(dados);
+    setIdContato (idContato + 2);
+    setDados(dados => [...dados, {key: idContato.toString(), value:[nome, telefone]}]);
   }
 
   return (
@@ -49,16 +51,23 @@ export default function App() {
           onPress={adicionarDadosContato}
         />
       </View>
-      <View>
-        {
-          dados.map((nome, telefone) =>
-          <View> 
-            <Text key={dados} style={styles.itemNaLista}>{nome}</Text>
+      <FlatList
+          data = {dados}
+          
+          renderItem = {
+            nome => (
+              <View style = {styles.itemNaLista}>
+                <Text>{nome.item.value}</Text>
+              </View>
+            ),
+            telefone => (
+              <View style = {styles.itemNaLista}>
+                <Text>{telefone.item.value}</Text>
+              </View>
+            )
+          }
+      />
 
-            <Text key={dados} style={styles.itemNaLista}>{telefone}</Text>
-          </View>)
-        }
-      </View>
     </View>
   );
 }
@@ -92,7 +101,12 @@ const styles = StyleSheet.create({
     marginBottom: 4
   },
   itemNaLista: {
-    width:'40%',
-
-  }
+    padding: 12,
+    backgroundColor: '#CCC',
+    borderColor: '#000',
+    borderWidth: 1,
+    marginBottom: 8,
+    borderRadius: 8
+    }
+    
 });
