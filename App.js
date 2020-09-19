@@ -1,69 +1,47 @@
-/**Crie uma aplicação React Native com Expo que permita o cadastro e listagem de contatos. 
- * Contatos possuem nome e telefone. 
- * Ela precisará de dois campos para inserção de dados e um botão para fazer a inserção.
- *      //useState para capturar os dados digitados pelo usuário 
- * Use um FlatList, como visto em aula, para exibir os dados de contato. 
- * Garanta que cada contato possui identificadaor único na lista. 
- * A lista de identificadores deve começar de 10 e somente números pares positivos podem ser utilizados como identificadores. 
- * Seja criativo, use “CSS” para descrever como se dá a exibição de cada item na lista.  */
+/**1. Refatore a sua aplicação. Crie, ao menos, dois componentes que serão utilizados
+pelo componente principal.
+2. Torne os itens da lista clicáveis.
+3. Apague um contato da lista quando um toque longo (diferente da aula, em que
+decidimos apagar com um toque simples) sobre ele acontecer. Descubra a propriedade
+de TouchableOpacity que viabiliza identificar esse evento. */
 
-import { StatusBar } from 'expo-status-bar';
 import React , {useState} from 'react';
 import { StyleSheet, Text, View, Button, TextInput, FlatList } from 'react-native';
 
+import CadastroItem from './components/CadastroItem';
+import CadastroInput from './components/CadastroInput';
+
 export default function App() {
-  const[nome, setNome] = useState('');
-  const[telefone, setTelefone] = useState('');
   const [dados, setDados] = useState([]);
   const[idContato, setIdContato] = useState(10);
 
-  //captura o texto digitado
-  const capturaNome = (nome) => setNome(nome);
-  const capturaTelefone = (telefone) => setTelefone(telefone);
-
   //para adicionar o que foi digitado
-  const adicionarDadosContato = () => {
+  const adicionarDadosContato = (nome, telefone) => {
     console.log(dados);
     setIdContato (idContato + 2);
-    setDados(dados => [...dados, {key: idContato.toString(), value:[nome, telefone]}]);
+    setDados([...dados, {key: idContato.toString(), value:[nome, telefone]}]);
+  }
+
+  const removerDadosContato = (keyASerRemovida) => {
+    setDados(dados => {
+      return dados.filter((nome) => {
+        nome.key !== keyASerRemovida
+      })
+    });
   }
 
   return (
     <View style={styles.telaPrincipal}>
       <Text style={styles.titulo}>Cadastro de Contatos</Text>
-      <View style={styles.informacoes}>
-        <TextInput 
-          placeholder="Digite seu nome" 
-          style={styles.nome}
-          onChangeText={capturaNome}
-          value={nome}
-        />
-        <TextInput 
-          placeholder="Digite seu telefone" 
-          style={styles.telefone}
-          onChangeText={capturaTelefone}
-          value={telefone}
-        />
-      </View>
-      <View>
-        <Button 
-          title='Adicionar'
-          onPress={adicionarDadosContato}
-        />
-      </View>
+      <CadastroInput onAdicionarContato={adicionarDadosContato}/>
       <FlatList
           data = {dados}
-          
           renderItem = {
-            nome => (
-              <View style = {styles.itemNaLista}>
-                <Text>{nome.item.value}</Text>
-              </View>
-            ),
-            telefone => (
-              <View style = {styles.itemNaLista}>
-                <Text>{telefone.item.value}</Text>
-              </View>
+            nome =>(
+              <CadastroItem
+                chave = {nome.item.key} 
+                nome={nome.item.value}
+                onDelete={removerDadosContato}/>
             )
           }
       />
